@@ -19,69 +19,74 @@ import static org.junit.jupiter.api.DynamicTest.stream;
 public class RewardByGiftServiceDynamicTest {
     private RewardByGiftService reward = null;
 
-    @BeforeEach
+    @BeforeEach // recordar que los metodos @BeforeEach no se ejecutan cada vez que se ejecuta un TestFactory
     void setUp() {
         reward = new RewardByGiftService();
         reward.setNeededPoints(100);
         System.out.println("BeforeEach");
     }
+    
+    // primero docoro el metodo con @TestFactory, no con @Test
+    // Este testfactory retorna una Collection
+    @TestFactory
+    Collection<DynamicTest> dynamicTestsFromCollection_collection() {
+        return Arrays.asList(
+                dynamicTest( // metodo estatico de DynamicTest
+                        "1st dynamic test",
+                        () -> assertEquals(1, 1)),
+                dynamicTest(
+                        "2nd dynamic test",
+                        () -> assertEquals(1, 1))
+        );
+    }
 
-//    @TestFactory
-//    Collection<DynamicTest> dynamicTestsFromCollection() {
-//        return Arrays.asList(
-//                dynamicTest(
-//                        "1st dynamic test",
-//                        () -> assertEquals(11, 1)),
-//                dynamicTest(
-//                        "2nd dynamic test",
-//                        () -> assertEquals(1, 1))
-//        );
-//    }
+    // Este testfactory retorna un ITERABLE
+    @TestFactory
+    Iterable<DynamicTest> dynamicTestsFromCollection_iterable() {
+        return Arrays.asList(
+                dynamicTest(
+                        "1st dynamic test",
+                        () -> assertEquals(1, 1)),
+                dynamicTest(
+                        "2nd dynamic test",
+                        () -> assertEquals(1, 1))
+        );
+    }
 
-//    @TestFactory
-//    Iterable<DynamicTest> dynamicTestsFromCollection() {
-//        return Arrays.asList(
-//                dynamicTest(
-//                        "1st dynamic test",
-//                        () -> assertEquals(1, 1)),
-//                dynamicTest(
-//                        "2nd dynamic test",
-//                        () -> assertEquals(1, 1))
-//        );
-//    }
-
-//    @TestFactory
-//    Iterator<DynamicTest> dynamicTestsFromCollection() {
-//        return Arrays.asList(
-//                dynamicTest(
-//                        "1st dynamic test",
-//                        () -> assertEquals(1, 1)),
-//                dynamicTest(
-//                        "2nd dynamic test",
-//                        () -> assertEquals(1, 1))
-//        ).iterator();
-//    }
-
-//    @TestFactory
-//    Stream<DynamicTest> giftProductNotInOrderRewardNotApplied() {
-//        return getStreamOfRandomNumbers()
-//                .limit(5)
-//                .mapToObj(randomId ->
-//                        dynamicTest(
-//                                "Testing product ID " + randomId,
-//                                () -> {
-//                                    reward.setGiftProductId(randomId);
-//                                    RewardInformation info = reward.applyReward(
-//                                            getSampleOrder(), 200);
-//
-//                                    assertEquals(0, info.getDiscount());
-//                                    assertEquals(0, info.getPointsRedeemed());
-//                                }
-//                        )
-//                );
-//    }
+    // Este testfactory retorna un Iterator
+    @TestFactory
+    Iterator<DynamicTest> dynamicTestsFromCollection_iterator() {
+        return Arrays.asList(
+                dynamicTest(
+                        "1st dynamic test",
+                        () -> assertEquals(1, 1)),
+                dynamicTest(
+                        "2nd dynamic test",
+                        () -> assertEquals(1, 1))
+        ).iterator();
+    }
 
     @TestFactory
+    Stream<DynamicTest> giftProductNotInOrderRewardNotApplied_1() {
+        return getStreamOfRandomNumbers()
+                .limit(7)
+                .mapToObj(randomId ->
+                        dynamicTest(
+                                "Testing product ID " + randomId,
+                                () -> {
+                                    reward.setGiftProductId(randomId);
+                                    RewardInformation info = reward.applyReward(
+                                            getSampleOrder(), 200);
+
+                                    assertEquals(0, info.getDiscount());
+                                    assertEquals(0, info.getPointsRedeemed());
+                                }
+                        )
+                );
+    }
+
+    @TestFactory
+    @Disabled
     Stream<DynamicTest> giftProductNotInOrderRewardNotApplied() {
         Iterator<Long> inputGeneratorIterator = getStreamOfRandomNumbers().limit(5).iterator();
 
@@ -104,6 +109,7 @@ public class RewardByGiftServiceDynamicTest {
     }
 
     @TestFactory
+    @Disabled
     Stream<DynamicContainer> dynamicTestsWithContainers() {
         return LongStream.range(1, 6)
                 .mapToObj(productId -> dynamicContainer(
